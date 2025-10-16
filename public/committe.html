@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Committee Dashboard - ITHS 2011 Alumni</title>
+<style>
+  :root {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #f8fafc;
+    color: #334155;
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 32px;
+    text-align: center;
+  }
+
+  .dashboard-header h1 {
+    margin: 0 0 8px 0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  .dashboard-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 16px;
+  }
+
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+  }
+
+  .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .candidates-section {
+    padding: 32px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::before {
+    content: "👥";
+    font-size: 20px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+  }
+
+  thead {
+    background: #f1f5f9;
+  }
+
+  th {
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s ease;
+  }
+
+  tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+  }
+
+  .empty-state .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 8px 0;
+    color: #475569;
+    font-weight: 600;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .timestamp {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  .position-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+
+  .refresh-btn {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .refresh-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+  }
+
+  .refresh-btn:active {
+    transform: translateY(0);
+  }
+
+  .search-box {
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 250px;
+  }
+
+  .search-box:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 12px;
+    }
+
+    .dashboard-header {
+      padding: 32px 20px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 24px;
+    }
+
+    .stats-container {
+      grid-template-columns: 1fr;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .candidates-section {
+      padding: 20px;
+    }
+
+    .controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .search-box {
+      min-width: auto;
+    }
+
+    th, td {
+      padding: 12px 16px;
+    }
+
+    .section-title {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table-container {
+      border-radius: 8px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .stat-number {
+      font-size: 24px;
+    }
+
+    .dashboard-header {
+      padding: 24px 16px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Committee Dashboard</h1>
+      <p>ITHS 2011 Alumni Election - Registered Candidates</p>
+    </div>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number" id="totalCandidates">0</div>
+        <div class="stat-label">Total Candidates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="uniquePositions">0</div>
+        <div class="stat-label">Positions Contested</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="latestRegistration">-</div>
+        <div class="stat-label">Latest Registration</div>
+      </div>
+    </div>
+
+    <div class="candidates-section">
+      <div class="controls">
+        <h2 class="section-title">Registered Candidates</h2>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <input type="text" id="searchInput" class="search-box" placeholder="Search candidates...">
+          <button id="refreshBtn" class="refresh-btn">
+            <span>🔄</span>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="candidateTable">
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th>Position</th>
+              <th>Email</th>
+              <th>Registration Time</th>
+            </tr>
+          </thead>
+          <tbody id="candidateTableBody">
+            <!-- Data will be populated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadCandidates() {
+      try {
+        // Show loading state
+        document.getElementById('refreshBtn').classList.add('loading');
+        
+        const res = await fetch("/api/candidates");
+        const data = await res.json();
+        
+        const tbody = document.getElementById('candidateTableBody');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Filter data based on search
+        const filteredData = data.filter(candidate => 
+          candidate.name.toLowerCase().includes(searchTerm) ||
+          candidate.position.toLowerCase().includes(searchTerm) ||
+          candidate.email.toLowerCase().includes(searchTerm)
+        );
+
+        if (filteredData.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="icon">📭</div>
+                  <h3>No candidates found</h3>
+                  <p>${searchTerm ? 'Try adjusting your search terms' : 'Be the first to register as a candidate!'}</p>
+                </div>
+              </td>
+            </tr>
+          `;
+        } else {
+          tbody.innerHTML = filteredData.map(candidate => `
+            <tr>
+              <td>
+                <strong>${candidate.name}</strong>
+              </td>
+              <td>
+                <span class="position-badge">${candidate.position}</span>
+              </td>
+              <td>${candidate.email}</td>
+              <td class="timestamp">
+                ${new Date(candidate.createdAt || candidate.timestamp).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </td>
+            </tr>
+          `).join("");
+        }
+
+        // Update statistics
+        updateStatistics(data);
+        
+      } catch (error) {
+        console.error('Error loading candidates:', error);
+        document.getElementById('candidateTableBody').innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <div class="icon">⚠️</div>
+                <h3>Error loading data</h3>
+                <p>Please try refreshing the page</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      } finally {
+        document.getElementById('refreshBtn').classList.remove('loading');
+      }
+    }
+
+    function updateStatistics(data) {
+      // Total candidates
+      document.getElementById('totalCandidates').textContent = data.length;
+      
+      // Unique positions
+      const uniquePositions = new Set(data.map(c => c.position)).size;
+      document.getElementById('uniquePositions').textContent = uniquePositions;
+      
+      // Latest registration
+      if (data.length > 0) {
+        const latest = new Date(Math.max(...data.map(c => new Date(c.createdAt || c.timestamp))));
+        const now = new Date();
+        const diffHours = Math.floor((now - latest) / (1000 * 60 * 60));
+        
+        let latestText;
+        if (diffHours < 1) {
+          latestText = 'Just now';
+        } else if (diffHours < 24) {
+          latestText = `${diffHours}h ago`;
+        } else {
+          latestText = `${Math.floor(diffHours / 24)}d ago`;
+        }
+        
+        document.getElementById('latestRegistration').textContent = latestText;
+      } else {
+        document.getElementById('latestRegistration').textContent = '-';
+      }
+    }
+
+    // Event listeners
+    document.getElementById('refreshBtn').addEventListener('click', loadCandidates);
+    document.getElementById('searchInput').addEventListener('input', loadCandidates);
+
+    // Auto-refresh every 30 seconds
+    setInterval(loadCandidates, 30000);
+
+    // Initial load
+    loadCandidates();
+  </script>
+</body>
+</html>

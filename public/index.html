@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ITHS 2011 Alumni Election</title>
+    <link rel="stylesheet" href="./style.css" />
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  </head>
+  <body>
+    <main class="card">
+      <h1>Interested Candidate</h1>
+      <p class="muted">
+        Enter your full name and choose the position you want to contest.
+      </p>
+
+      <form id="entryForm">
+        <div class="form-group">
+          <div class="form-row">
+            <div class="form-section">
+              <label for="name">Full name</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-section">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <div class="form-section">
+            <label for="position">Position</label>
+            <select id="position" name="position" required>
+              <option value="" disabled selected>Select a position</option>
+              <option value="Chairman">Chairman</option>
+              <option value="Vice-Chairman">Vice-Chairman</option>
+              <option value="Social Director 1">Social Director 1</option>
+              <option value="Social Director 2">Social Director 2</option>
+              <option value="Welfare Director 1">Welfare Director 1</option>
+              <option value="Welfare Director 2">Welfare Director 2</option>
+              <option value="PRO 1">PRO 1</option>
+              <option value="PRO 2">PRO 2</option>
+              <option value="Secretary 1">Secretary 1</option>
+              <option value="Secretary 2">Secretary 2</option>
+            </select>
+          </div>
+        </div>
+      
+        <button type="submit">Submit</button>
+      </form>
+    </main>
+
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+      // Form submission with AJAX and Toastify
+      document.getElementById('entryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          position: formData.get('position')
+        };
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        // Show loading state
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled = true;
+
+        try {
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            // Success message
+            Toastify({
+              text: result.msg || "Registration successful!",
+              duration: 5000,
+              close: true,
+              gravity: "top",
+              position: "center",
+              backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+              stopOnFocus: true
+            }).showToast();
+
+            // Reset form
+            this.reset();
+          } else {
+            // Error message
+            Toastify({
+              text: result.msg || "Registration failed!",
+              duration: 5000,
+              close: true,
+              gravity: "top",
+              position: "center",
+              backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+              stopOnFocus: true
+            }).showToast();
+          }
+        } catch (error) {
+          // Network error
+          Toastify({
+            text: "Network error. Please try again.",
+            duration: 5000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "linear-gradient(to right, #ff416c, #ff4b2b)",
+            stopOnFocus: true
+          }).showToast();
+          console.error('Error:', error);
+        } finally {
+          // Reset button state
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

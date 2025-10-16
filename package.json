@@ -1,0 +1,29 @@
+{
+  "name": "iths-2011-alumi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.1",
+    "nodemailer": "^7.0.9",
+    "resend": "^6.1.3",
+    "toastify-js": "^1.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "@vercel/node": "^2.0.0"
+  }
+}

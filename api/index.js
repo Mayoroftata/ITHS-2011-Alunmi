@@ -75,7 +75,7 @@ app.post("/register", async (req, res) => {
 });
 
 // Committee dashboard
-app.get("/candidates", async (req, res) => {
+app.get("/api/candidates", async (req, res) => {
   try {
     const candidates = await Candidate.find().sort({ createdAt: -1 });
     res.json(candidates);

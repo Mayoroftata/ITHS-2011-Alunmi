@@ -94,6 +94,7 @@ app.get("/api/health", (req, res) => {
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "committe.html"));
 });
